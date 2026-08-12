@@ -443,15 +443,23 @@ Chez vous, vous décidez. Moi je fais. C'est tout.
 
 **Pilier :** coulisses · **Format :** texte seul · **Objectif :** attachement — **ce post utilise tes vrais chiffres**
 
-```
-En trois mois, j'ai envoyé 281 messages de prospection sur LinkedIn.
+> ⚠️ **C'est une suite, pas un post neuf.** Tu as publié « Le paradoxe brut » le 6 mai (193 impressions, 6 likes, 1 commentaire), qui annonçait déjà « 183 messages envoyés en 90 jours, 0 commentaire posté ». Republier le même constat serait une redite que tes lecteurs fidèles repéreraient. La version ci-dessous s'appuie explicitement sur ce post-là — c'est plus fort, parce qu'un bilan à 3 mois prouve que tu mesures dans la durée.
 
-Résultat : 0 rendez-vous.
+```
+Il y a trois mois, j'ai publié mes chiffres LinkedIn ici.
+183 messages envoyés, 0 commentaire posté, un inbox qui débordait.
+
+Je viens de refaire le calcul. Voilà la suite.
+
+281 messages envoyés au total.
+Toujours 0 commentaire posté.
+Et surtout : 0 rendez-vous.
 
 Je pourrais ne pas l'écrire. Ça n'a pas l'air terrible quand on
-vend ses services. Mais je préfère raconter ce que j'ai compris.
+vend ses services. Mais un bilan qu'on ne publie que quand il est
+bon n'est pas un bilan.
 
-J'ai regardé mes chiffres en détail cette semaine.
+Alors j'ai regardé mes chiffres en détail cette semaine.
 
 Sur les gens à qui j'ai écrit à froid : 28 % ont accepté mon
 invitation, 15 % ont répondu.
@@ -476,7 +484,7 @@ Je publie ici trois fois par semaine, je commente tous les jours
 chez les gens que je veux aider, et j'écris seulement à ceux qui
 m'ont déjà croisé quelque part.
 
-Je vous raconterai dans 90 jours si ça a marché.
+Rendez-vous dans 90 jours pour le troisième épisode.
 Avec les vrais chiffres, bons ou mauvais.
 
 Si vous prospectez et que vous avez l'impression de crier dans
@@ -486,7 +494,9 @@ juste qu'on ne sait pas encore qui vous êtes.
 #Prospection #Entrepreneuriat #LinkedIn
 ```
 
-> **Note.** Ce post est vrai — ce sont tes chiffres YaduLink exacts. Il est puissant parce qu'il est vérifiable et qu'il montre quelqu'un qui mesure et corrige. Le risque « il n'arrive pas à vendre » est neutralisé par la structure : le sujet du post n'est pas l'échec, c'est la leçon. Si tu n'es pas à l'aise, remplace « 0 rendez-vous » par « très peu de résultats » — mais garde le reste, le contraste 28 % / 75 % est le cœur du post.
+> **Note.** Ce post est vrai — ce sont tes chiffres YaduLink exacts. Il est puissant parce qu'il est vérifiable, qu'il s'inscrit dans une série commencée en mai, et qu'il montre quelqu'un qui mesure et corrige. Le risque « il n'arrive pas à vendre » est neutralisé par la structure : le sujet n'est pas l'échec, c'est la leçon. Si tu n'es pas à l'aise, remplace « 0 rendez-vous » par « très peu de résultats » — mais garde le reste, le contraste 28 % / 75 % est le cœur du post.
+>
+> **Pense à commenter ton propre post de mai** pour y renvoyer les nouveaux lecteurs : deux posts qui se répondent à trois mois d'écart valent mieux que deux posts isolés.
 
 ---
 
