@@ -253,12 +253,15 @@ def line(row, label, formula, fmt=None, bold=False):
     vc.alignment = Alignment(horizontal="right")
     return vc
 
-R = f"2:{LAST}"
+def rg(col):
+    """Plage absolue d'une colonne de l'onglet Inventaire, lignes 2 à LAST."""
+    return f"Inventaire!${col}$2:${col}${LAST}"
+
 head(4, "Volume")
-line(5, "Œuvres différentes référencées", f"=COUNTA(Inventaire!A{R})", "#,##0")
-line(6, "Exemplaires au total (doubles inclus)", f"=SUM(Inventaire!O{R})", "#,##0")
-line(7, "Photographiées et prêtes", f'=COUNTIFS(Inventaire!Q{R},"Oui")', "#,##0")
-line(8, "Vérifiées à la loupe (litho confirmée)", f'=COUNTIFS(Inventaire!R{R},"Oui — litho")', "#,##0")
+line(5, "Œuvres différentes référencées", f"=COUNTA({rg('A')})", "#,##0")
+line(6, "Exemplaires au total (doubles inclus)", f"=SUM({rg('O')})", "#,##0")
+line(7, "Photographiées et prêtes", f'=COUNTIFS({rg("Q")},"Oui")', "#,##0")
+line(8, "Vérifiées à la loupe (litho confirmée)", f'=COUNTIFS({rg("R")},"Oui — litho")', "#,##0")
 
 head(10, "Répartition par segment")
 db.cell(10, 3, "Œuvres").font = HDR_FONT
@@ -270,11 +273,11 @@ for i in (3, 4, 5):
 for i, (seg, lbl) in enumerate([("A", "A — Pièces fortes"), ("B", "B — Courant"), ("C", "C — Volume / doubles")]):
     row = 11 + i
     db.cell(row, 2, lbl).font = BLACK
-    db.cell(row, 3, f'=COUNTIFS(Inventaire!S{R},"{seg}")').font = BLACK
+    db.cell(row, 3, f'=COUNTIFS({rg("S")},"{seg}")').font = BLACK
     db.cell(row, 3).number_format = "#,##0"
-    db.cell(row, 4, f'=SUMIFS(Inventaire!O{R},Inventaire!S{R},"{seg}")').font = BLACK
+    db.cell(row, 4, f'=SUMIFS({rg("O")},{rg("S")},"{seg}")').font = BLACK
     db.cell(row, 4).number_format = "#,##0"
-    db.cell(row, 5, f'=SUMIFS(Inventaire!V{R},Inventaire!S{R},"{seg}")').font = BLACK
+    db.cell(row, 5, f'=SUMIFS({rg("V")},{rg("S")},"{seg}")').font = BLACK
     db.cell(row, 5).number_format = EUR
 db.cell(14, 2, "Total").font = BOLD
 db.cell(14, 3, "=SUM(C11:C13)").font = BOLD
@@ -287,28 +290,28 @@ for i in (2, 3, 4, 5):
     db.cell(14, i).fill = BAND
 
 head(16, "Avancement")
-line(17, "En ligne actuellement", f'=COUNTIFS(Inventaire!X{R},"En ligne")', "#,##0")
-line(18, "Vendues", f'=COUNTIFS(Inventaire!X{R},"VENDUE")', "#,##0")
-line(19, "Invendues / retirées", f'=COUNTIFS(Inventaire!X{R},"Invendue")+COUNTIFS(Inventaire!X{R},"Retirée")', "#,##0")
+line(17, "En ligne actuellement", f'=COUNTIFS({rg("X")},"En ligne")', "#,##0")
+line(18, "Vendues", f'=COUNTIFS({rg("X")},"VENDUE")', "#,##0")
+line(19, "Invendues / retirées", f'=COUNTIFS({rg("X")},"Invendue")+COUNTIFS({rg("X")},"Retirée")', "#,##0")
 db.cell(17, 7, "Garde ce chiffre entre 5 et 10. Au-delà, tu casses tes propres prix.").font = SUB
 
 head(21, "Argent")
-line(22, "Chiffre d'affaires brut", f"=SUM(Inventaire!Z{R})", EUR)
-line(23, "Frais et ports payés", f"=SUM(Inventaire!AA{R})", EUR)
-line(24, "Net réellement encaissé", f"=SUM(Inventaire!AB{R})", EUR, bold=True)
+line(22, "Chiffre d'affaires brut", f"=SUM({rg('Z')})", EUR)
+line(23, "Frais et ports payés", f"=SUM({rg('AA')})", EUR)
+line(24, "Net réellement encaissé", f"=SUM({rg('AB')})", EUR, bold=True)
 db.cell(24, 2).fill = BAND
 db.cell(24, 3).fill = BAND
 line(25, "Prix net moyen par pièce vendue",
-     f'=IFERROR(SUM(Inventaire!AB{R})/COUNTIFS(Inventaire!X{R},"VENDUE"),0)', EUR)
+     f'=IFERROR(SUM({rg("AB")})/COUNTIFS({rg("X")},"VENDUE"),0)', EUR)
 line(26, "Réalisé / valeur cible totale", "=IFERROR(C24/E14,0)", PCT)
 db.cell(26, 7, "Sous 60 %, tes prix cibles sont trop optimistes : révise-les.").font = SUB
 
 head(28, "Seuil fiscal à surveiller (France)")
-line(29, "Ventes individuelles > 5 000 €", f"=COUNTIFS(Inventaire!Z{R},\">5000\")", "#,##0")
+line(29, "Ventes individuelles > 5 000 €", f'=COUNTIFS({rg("Z")},">5000")', "#,##0")
 db.cell(29, 7, "Au-delà de 5 000 € par cession : taxe forfaitaire de 6,5 % sur le prix de vente "
         "(ou option plus-value). En dessous : exonéré.").font = SUB
 db.cell(29, 7).alignment = Alignment(wrap_text=True)
-line(30, "Nombre de ventes sur l'année", f'=COUNTIFS(Inventaire!X{R},"VENDUE")', "#,##0")
+line(30, "Nombre de ventes sur l'année", f'=COUNTIFS({rg("X")},"VENDUE")', "#,##0")
 db.cell(30, 7, "Au-delà de 30 ventes OU 2 000 € par plateforme et par an, la plateforme "
         "transmet tes données au fisc (DAC7). Ce n'est pas un impôt, mais anticipe-le.").font = SUB
 db.cell(30, 7).alignment = Alignment(wrap_text=True)
@@ -318,82 +321,186 @@ db.cell(30, 7).alignment = Alignment(wrap_text=True)
 # ----------------------------------------------------------------------------
 px = wb.create_sheet("Repères de prix")
 px.sheet_view.showGridLines = False
-for col, w in (("A", 3), ("B", 22), ("C", 34), ("D", 16), ("E", 16), ("F", 14), ("G", 46)):
+for col, w in (("A", 3), ("B", 24), ("C", 38), ("D", 14), ("E", 14), ("F", 14), ("G", 44)):
     px.column_dimensions[col].width = w
 
-px["B1"] = "Repères de prix observés"
+px["B1"] = "Repères de prix — 5 artistes identifiés"
 px["B1"].font = TITLE
-px["B2"] = ("Distinction capitale : un PRIX DEMANDÉ n'est pas un PRIX OBTENU. "
-            "Les galeries affichent 400-1 200 € ; les enchères adjugent 50-250 €.")
+px["B2"] = ("Règle n°1 : un PRIX DEMANDÉ n'est pas un PRIX OBTENU. Les galeries affichent "
+            "400-1 200 €, les salles adjugent 50-550 €. Cale-toi sur la colonne ADJUGÉ.")
 px["B2"].font = SUB
 px["B2"].alignment = Alignment(wrap_text=True)
 px.row_dimensions[2].height = 28
 
-phdr = ["Artiste", "Référence observée", "Type de prix", "Bas (€)", "Haut (€)", "Source"]
-for i, h in enumerate(phdr, start=2):
-    c = px.cell(4, i, h)
-    c.font = HDR_FONT
-    c.fill = HDR_FILL
-    c.alignment = Alignment(horizontal="center", wrap_text=True)
-    c.border = BOX
+def sect(row, label):
+    c = px.cell(row, 2, label)
+    c.font = Font(name=FONT, size=11, bold=True, color="1F3864")
+    for i in range(2, 8):
+        px.cell(row, i).fill = GREY
 
+def thead(row, labels):
+    for i, h in enumerate(labels, start=2):
+        c = px.cell(row, i, h)
+        c.font = HDR_FONT
+        c.fill = HDR_FILL
+        c.alignment = Alignment(horizontal="center", wrap_text=True)
+        c.border = BOX
+
+# --- A. Hiérarchie des artistes ---------------------------------------------
+sect(4, "Hiérarchie de tes artistes — par où commencer")
+thead(5, ["Artiste", "Priorité", "Net bas", "Net haut", "", "Pourquoi"])
+hierarchie = [
+    ("Yves Brayer (1907-1990)", "1 — LE MEILLEUR", 150, 500,
+     "Membre de l'Institut, musée à son nom aux Baux. Camargue, taureaux, Provence. "
+     "Seul de tes artistes dont les lithos passent régulièrement les 500 € en salle."),
+    ("Hasegawa", "2 — À CLARIFIER", 60, 250,
+     "S'il s'agit de KIYOSHI Hasegawa (1891-1980, manière noire), la cote est nettement "
+     "supérieure. Si c'est SHOICHI (1929-2023), on reste dans la fourchette ci-contre. "
+     "Vérifie le prénom sur les certificats — l'écart est énorme."),
+    ("Claude Weisbuch (1927-2014)", "3", 60, 200,
+     "Cavaliers, musiciens, théâtre. Cote en baisse mais les estampes résistent mieux "
+     "que ses huiles."),
+    ("Camille Hilaire (1916-2004)", "4", 50, 150,
+     "Paysages, forêts, chevaux. Très présent sur le marché, prix courants 89-150 €."),
+    ("Louis Toffoli (1907-1999)", "5 — LE PLUS COMMUN", 50, 180,
+     "Éditions très nombreuses. Sujets musiciens et maternités = le haut de la fourchette ; "
+     "le reste peine à dépasser 100 €."),
+]
+for i, (a, prio, bas, haut, why) in enumerate(hierarchie):
+    r0 = 6 + i
+    px.cell(r0, 2, a).font = BOLD
+    c = px.cell(r0, 3, prio)
+    c.font = BOLD if i == 0 else BLACK
+    c.alignment = Alignment(horizontal="center")
+    if i == 0:
+        c.fill = PatternFill("solid", fgColor="E2EFDA")
+    px.cell(r0, 4, bas).number_format = EUR
+    px.cell(r0, 5, haut).number_format = EUR
+    px.cell(r0, 4).font = BLUE
+    px.cell(r0, 5).font = BLUE
+    px.merge_cells(start_row=r0, start_column=6, end_row=r0, end_column=7)
+    w = px.cell(r0, 6, why)
+    w.font = BLACK
+    w.alignment = Alignment(wrap_text=True, vertical="top")
+    for ci in range(2, 8):
+        px.cell(r0, ci).border = BOX
+    px.row_dimensions[r0].height = 46
+px.cell(11, 2, "Fourchettes NETTES par pièce, après frais de plateforme — synthèse des "
+        "résultats observés ci-dessous, pas une cotation officielle.").font = SUB
+px.merge_cells("B11:G11")
+
+# --- B. Prix observés --------------------------------------------------------
+sect(13, "Prix réellement observés, avec sources")
+thead(14, ["Artiste", "Référence", "Type de prix", "Bas", "Haut", "Source"])
 data = [
-    ["Louis Toffoli", "« Maternité », litho couleurs 50x65, 53/150",
-     "ADJUGÉ (2021)", 100, 100, "mw-encheres.com — estimée 60-80 €, adjugée 100 €"],
-    ["Louis Toffoli", "« Couple sur un banc », litho sur japon 50x73",
-     "Estimation salle (2023)", 50, 100, "richardmdv.com, vente du 12/12/2023"],
-    ["Louis Toffoli", "Fourchette générale des estampes en salle",
-     "Adjugé (marché)", 30, 300, "mr-expert.com / expertisez.com"],
-    ["Louis Toffoli", "Annonces particuliers et galeries",
-     "PRIX DEMANDÉ", 120, 1090, "leboncoin, eBay, passion-estampes"],
-    ["Claude Weisbuch", "« Grande parade », litho signée BD",
+    ["Yves Brayer", "Scène taurine, litho couleur signée au crayon",
+     "ADJUGÉ", 550, 550, "Résultat de salle"],
+    ["Yves Brayer", "Suite de 6 lithographies, Camargue, bon état",
+     "ADJUGÉ", 1800, 1800, "Résultat de salle — l'intérêt des séries complètes"],
+    ["Yves Brayer", "Lithographies signées et numérotées",
+     "Fourchette marché", 200, 600, "mr-expert.com / gazette-drouot.com"],
+    ["Shoichi Hasegawa", "Estampes et multiples, estimation en salle",
+     "Fourchette marché", 40, 300, "mr-expert.com"],
+    ["Shoichi Hasegawa", "Estampes-multiples selon base Artprice",
+     "Fourchette base", 100, 3000, "Artprice, via galerie-creation"],
+    ["Kiyoshi Hasegawa", "À NE PAS CONFONDRE — maître de la manière noire",
+     "Repère", 300, 5000, "mr-expert.com — cote très supérieure"],
+    ["Claude Weisbuch", "« Grande parade », litho signée en bas à droite",
      "Estimation salle (2025)", 200, 300, "primardeco.com"],
-    ["Claude Weisbuch", "Fourchette générale des multiples",
-     "Adjugé (marché)", 30, 400, "mr-expert.com"],
+    ["Claude Weisbuch", "Multiples, fourchette générale",
+     "Fourchette marché", 30, 400, "mr-expert.com"],
     ["Claude Weisbuch", "« Deux Cavaliers », litho signée /125",
      "PRIX DEMANDÉ", 487, 487, "1stdibs.com"],
+    ["Camille Hilaire", "Multiples en salle, fourchette générale",
+     "Fourchette marché", 10, 1500, "mr-expert.com"],
+    ["Camille Hilaire", "Lithographies signées, prix courants en ligne",
+     "PRIX DEMANDÉ", 89, 280, "leboncoin / passion-estampes"],
+    ["Louis Toffoli", "« Maternité » 50x65, n° 53/150 — estimée 60-80 €",
+     "ADJUGÉ (2021)", 100, 100, "mw-encheres.com"],
+    ["Louis Toffoli", "« Couple sur un banc », litho sur japon 50x73",
+     "Estimation salle (2023)", 50, 100, "richardmdv.com, vente du 12/12/2023"],
+    ["Louis Toffoli", "Estampes, fourchette générale en salle",
+     "Fourchette marché", 30, 300, "mr-expert.com / expertisez.com"],
+    ["Louis Toffoli", "Annonces particuliers et galeries",
+     "PRIX DEMANDÉ", 120, 1090, "leboncoin, eBay, passion-estampes"],
 ]
-for ri, row in enumerate(data, start=5):
+for ri, row in enumerate(data, start=15):
     for ci, val in enumerate(row, start=2):
         c = px.cell(ri, ci, val)
-        c.font = BLACK if "ADJUG" not in str(row[2]).upper() else BOLD
+        c.font = BOLD if "ADJUG" in row[2] else BLACK
         c.border = BOX
         c.alignment = Alignment(wrap_text=True, vertical="top")
         if ci in (5, 6):
             c.number_format = EUR
-    px.row_dimensions[ri].height = 28
+            c.alignment = Alignment(horizontal="right")
+    px.row_dimensions[ri].height = 26
     if "DEMANDÉ" in row[2]:
         for ci in range(2, 8):
             px.cell(ri, ci).fill = PatternFill("solid", fgColor="FDE9E9")
+    elif "ADJUG" in row[2]:
+        for ci in range(2, 8):
+            px.cell(ri, ci).fill = PatternFill("solid", fgColor="E2EFDA")
 
-px.cell(13, 2, "Ce que disent les experts du marché").font = Font(name=FONT, size=11, bold=True, color="1F3864")
-notes = [
-    ("Toffoli", "« Très nombreuses sur le marché de l'art, la réelle valeur des estampes est aujourd'hui très faible. » — expertisez.com"),
-    ("Weisbuch", "« La cote subit une tendance à la baisse et une désaffection des acquéreurs, car les estimations trop élevées ne trouvent pas d'acheteurs. » — mr-expert.com"),
-    ("Conséquence", "Le prix affiché n'est pas le problème : c'est le prix auquel un acheteur clique. Vise le haut de la fourchette ADJUGÉE, pas le bas de la fourchette DEMANDÉE."),
+# --- C. Avertissement Artprice ----------------------------------------------
+sect(31, "Artprice : outil de recherche, PAS un canal de vente")
+arts = [
+    ("Ce que c'est", "Une base de 30 millions de résultats d'enchères sur 700 000 artistes. "
+     "C'est l'outil que les commissaires-priseurs consultent pour estimer."),
+    ("Le coût", "Abonnement obligatoire : 196 €/an en basique, jusqu'à 407 €/an en pro. "
+     "Sa marketplace prend en plus 5 à 9 % TTC de frais vendeur."),
+    ("Le problème", "L'audience y vient CHERCHER DES PRIX, pas acheter de la décoration murale. "
+     "Pour écouler 300 lithographies d'éditeur, le débit est quasi nul."),
+    ("Verdict", "Ne t'abonne pas pour vendre. Si tu veux des résultats d'enchères, "
+     "Interencheres, Gazette Drouot, Barnebys et le filtre « objets vendus » d'eBay "
+     "te donnent l'essentiel gratuitement."),
 ]
-for i, (a, b) in enumerate(notes):
-    r0 = 14 + i
+for i, (a, b) in enumerate(arts):
+    r0 = 32 + i
     px.cell(r0, 2, a).font = BOLD
     c = px.cell(r0, 3, b)
     c.font = BLACK
     c.alignment = Alignment(wrap_text=True, vertical="top")
     px.merge_cells(start_row=r0, start_column=3, end_row=r0, end_column=7)
-    px.row_dimensions[r0].height = 32
+    px.row_dimensions[r0].height = 30
 
-px.cell(19, 2, "Ce qui fait monter le prix").font = Font(name=FONT, size=11, bold=True, color="1F3864")
+# --- D. Ce que disent les experts -------------------------------------------
+sect(37, "Ce que disent les experts du marché")
+notes = [
+    ("Toffoli", "« Très nombreuses sur le marché de l'art, la réelle valeur des estampes "
+     "est aujourd'hui très faible. » — expertisez.com"),
+    ("Weisbuch", "« La cote subit une tendance à la baisse et une désaffection des acquéreurs, "
+     "car les estimations trop élevées ne trouvent pas d'acheteurs. » — mr-expert.com"),
+    ("Hilaire", "Marché stable mais encombré : la plupart des lithos signées se négocient "
+     "entre 89 et 150 €."),
+    ("Brayer", "Le seul dont les séries complètes atteignent 1 000 à 2 000 €. "
+     "Ne casse jamais une suite pour la vendre à la pièce."),
+]
+for i, (a, b) in enumerate(notes):
+    r0 = 38 + i
+    px.cell(r0, 2, a).font = BOLD
+    c = px.cell(r0, 3, b)
+    c.font = BLACK
+    c.alignment = Alignment(wrap_text=True, vertical="top")
+    px.merge_cells(start_row=r0, start_column=3, end_row=r0, end_column=7)
+    px.row_dimensions[r0].height = 30
+
+# --- E. Ce qui fait monter le prix ------------------------------------------
+sect(43, "Ce qui fait monter le prix")
 plus = [
     "Petit tirage (moins de 150) plutôt que 250-300.",
-    "Sujet recherché : musiciens, maternités, marines, travailleurs pour Toffoli ; cavaliers, musiciens, théâtre pour Weisbuch.",
+    "Sujet recherché : Camargue, taureaux et Provence pour Brayer ; cavaliers, musiciens et "
+    "théâtre pour Weisbuch ; musiciens, maternités et marines pour Toffoli.",
     "Épreuve d'artiste (EA) ou hors commerce (HC) plutôt qu'un simple numéro.",
-    "Vraie lithographie sur pierre (grain irrégulier) plutôt qu'un offset signé.",
+    "Suite ou portfolio complet gardé groupé — chez Brayer, ça double la mise.",
     "Papier de qualité à bords barbés (Arches, BFK Rives) + timbre sec d'atelier.",
-    "État neuf, marges intactes, jamais encadré sous verre sans marie-louise.",
+    "État neuf, marges intactes, jamais massicotées.",
 ]
 for i, t in enumerate(plus):
-    c = px.cell(20 + i, 3, "•  " + t)
+    c = px.cell(44 + i, 3, "•  " + t)
     c.font = BLACK
-    px.merge_cells(start_row=20 + i, start_column=3, end_row=20 + i, end_column=7)
+    c.alignment = Alignment(wrap_text=True, vertical="top")
+    px.merge_cells(start_row=44 + i, start_column=3, end_row=44 + i, end_column=7)
+    px.row_dimensions[44 + i].height = 26
 
 # ----------------------------------------------------------------------------
 # 5. PLAN DE VENTE
