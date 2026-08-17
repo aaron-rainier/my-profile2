@@ -1,0 +1,187 @@
+---
+import Base from "../../layouts/Base.astro";
+import CarteOeuvre from "../../components/CarteOeuvre.astro";
+import { toutesLesOeuvres, SITE_URL } from "../../lib/oeuvres";
+
+export function getStaticPaths() {
+  return toutesLesOeuvres().map((oeuvre) => ({
+    params: { id: oeuvre.id },
+    props: { oeuvre },
+  }));
+}
+
+const { oeuvre } = Astro.props;
+
+const memeArtiste = toutesLesOeuvres()
+  .filter((o) => o.artiste === oeuvre.artiste && o.id !== oeuvre.id)
+  .slice(0, 4);
+
+const alt = `${oeuvre.artiste} — ${oeuvre.titreAffiche} — lithographie originale signée`;
+
+const caracteristiques = [
+  ["Artiste", oeuvre.artiste],
+  ["Titre", oeuvre.titreAffiche],
+  ["Année", oeuvre.annee],
+  ["Technique", oeuvre.technique],
+  ["Numérotation", oeuvre.numerotation],
+  ["Signature", oeuvre.signature],
+  ["Dimensions de la feuille", oeuvre.dimensions],
+  ["Papier", oeuvre.papier],
+  ["État", oeuvre.etat],
+  ["Certificat d'authenticité", oeuvre.certificat ? "Fourni avec l'œuvre" : ""],
+].filter(([, v]) => v !== "");
+
+const description =
+  `${oeuvre.technique} de ${oeuvre.artiste}` +
+  (oeuvre.numerotation ? `, numérotée ${oeuvre.numerotation}` : "") +
+  (oeuvre.signature ? `, ${oeuvre.signature.toLowerCase()}` : "") +
+  (oeuvre.dimensions ? `. Feuille ${oeuvre.dimensions}` : "") +
+  `. ${oeuvre.etat || "État neuf"}.`;
+
+const dispo =
+  oeuvre.statut === "vendue"
+    ? "https://schema.org/SoldOut"
+    : oeuvre.statut === "reservee"
+      ? "https://schema.org/LimitedAvailability"
+      : "https://schema.org/InStock";
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Product",
+  name: `${oeuvre.artiste} — ${oeuvre.titreAffiche}`,
+  description,
+  image: oeuvre.images.map((i) => `${SITE_URL}${i}`),
+  category: "Estampe originale",
+  brand: { "@type": "Person", name: oeuvre.artiste },
+  ...(oeuvre.prix !== null && {
+    offers: {
+      "@type": "Offer",
+      price: oeuvre.prix,
+      priceCurrency: "EUR",
+      availability: dispo,
+      itemCondition: "https://schema.org/NewCondition",
+    },
+  }),
+});
+
+const objetContact = `Demande — ${oeuvre.artiste} (réf. ${oeuvre.id})`;
+---
+
+<Base
+  titre={`${oeuvre.artiste} — ${oeuvre.titreAffiche} — lithographie originale signée et numérotée`}
+  description={description}
+  image={oeuvre.images[0]}
+  jsonLd={jsonLd}
+>
+  <div class="enveloppe">
+    <p class="surtitre">
+      <a href="/catalogue" style="color:inherit">Catalogue</a> ·
+      <a href={`/artiste/${oeuvre.artisteSlug}`} style="color:inherit">{oeuvre.artiste}</a>
+    </p>
+
+    <div class="fiche">
+      <div>
+        <div class="fiche-visuel">
+          {
+            oeuvre.images.length > 0 ? (
+              <img id="visuel" src={oeuvre.images[0]} alt={alt} />
+            ) : (
+              <span class="sans-photo">
+                Photo à déposer&nbsp;:<br />
+                public/oeuvres/{oeuvre.id}-1.jpg
+              </span>
+            )
+          }
+        </div>
+
+        {
+          oeuvre.images.length > 1 && (
+            <div class="vignettes" id="vignettes">
+              {oeuvre.images.map((src, i) => (
+                <button type="button" data-src={src} aria-pressed={i === 0 ? "true" : "false"}>
+                  <img src={src} alt={`${alt} — vue ${i + 1}`} loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <div>
+        <h1>{oeuvre.artiste}</h1>
+        <p class="chapeau" style="font-style:italic;margin-top:-0.4rem">{oeuvre.titreAffiche}</p>
+
+        <table class="caracteristiques">
+          <tbody>
+            {
+              caracteristiques.map(([cle, valeur]) => (
+                <tr>
+                  <th scope="row">{cle}</th>
+                  <td>{valeur}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+
+        {
+          oeuvre.statut === "vendue" ? (
+            <>
+              <div class="bandeau-vendue">
+                Cette œuvre a trouvé preneur. D'autres estampes du même artiste restent
+                disponibles.
+              </div>
+              <a class="bouton bouton-clair" href={`/artiste/${oeuvre.artisteSlug}`}>
+                Voir les autres œuvres de {oeuvre.artiste}
+              </a>
+            </>
+          ) : (
+            <>
+              {oeuvre.statut === "reservee" && (
+                <div class="bandeau-vendue">Œuvre actuellement réservée.</div>
+              )}
+              <p class="prix-fort">{oeuvre.prixTexte}</p>
+              <p style="color:var(--encre-douce);font-size:0.9rem;margin-top:0">
+                Remise en main propre à Paris, ou expédition en tube rigide assuré.
+              </p>
+              <p style="margin-top:1.4rem">
+                <a class="bouton" href={`/contact?oeuvre=${encodeURIComponent(objetContact)}`}>
+                  Demander cette œuvre
+                </a>
+              </p>
+            </>
+          )
+        }
+
+        {oeuvre.notes && <p style="color:var(--encre-douce);font-size:0.92rem">{oeuvre.notes}</p>}
+      </div>
+    </div>
+
+    {
+      memeArtiste.length > 0 && (
+        <section class="section" style="margin-top:4.5rem">
+          <h2>Du même artiste</h2>
+          <div class="grille">
+            {memeArtiste.map((o) => (
+              <CarteOeuvre oeuvre={o} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </div>
+</Base>
+
+<script>
+  const vignettes = document.getElementById("vignettes");
+  const visuel = document.getElementById("visuel") as HTMLImageElement | null;
+
+  vignettes?.addEventListener("click", (e) => {
+    const bouton = (e.target as HTMLElement).closest("button");
+    if (!bouton || !visuel) return;
+    visuel.src = bouton.dataset.src ?? visuel.src;
+    vignettes
+      .querySelectorAll("button")
+      .forEach((b) => b.setAttribute("aria-pressed", b === bouton ? "true" : "false"));
+  });
+</script>

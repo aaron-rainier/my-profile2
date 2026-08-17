@@ -1,0 +1,173 @@
+---
+import Base from "../layouts/Base.astro";
+import CarteOeuvre from "../components/CarteOeuvre.astro";
+import { toutesLesOeuvres, tousLesArtistes } from "../lib/oeuvres";
+
+// Toutes les œuvres sont rendues en HTML à la construction : les filtres ne font
+// que masquer côté navigateur, si bien que Google voit l'intégralité du catalogue.
+const oeuvres = toutesLesOeuvres();
+const artistes = tousLesArtistes();
+
+const tranches = [
+  { valeur: "", libelle: "Tous les prix" },
+  { valeur: "0-150", libelle: "Jusqu'à 150 €" },
+  { valeur: "150-300", libelle: "150 à 300 €" },
+  { valeur: "300-500", libelle: "300 à 500 €" },
+  { valeur: "500-", libelle: "Plus de 500 €" },
+];
+---
+
+<Base
+  titre="Catalogue — lithographies originales signées et numérotées"
+  description={`Catalogue complet de la collection : ${oeuvres.length} lithographies originales signées et numérotées, filtrables par artiste et par prix.`}
+>
+  <div class="enveloppe">
+    <p class="surtitre">Catalogue</p>
+    <h1>Toutes les œuvres</h1>
+
+    <form class="filtres" id="filtres" aria-label="Filtrer le catalogue">
+      <fieldset>
+        <legend>Artiste</legend>
+        {
+          artistes.map((a) => (
+            <label>
+              <input type="checkbox" name="artiste" value={a.slug} />
+              {a.nom}
+            </label>
+          ))
+        }
+      </fieldset>
+
+      <fieldset>
+        <legend>Prix</legend>
+        <select name="prix">
+          {tranches.map((t) => <option value={t.valeur}>{t.libelle}</option>)}
+        </select>
+      </fieldset>
+
+      <fieldset>
+        <legend>Disponibilité</legend>
+        <label>
+          <input type="checkbox" name="masquer-vendues" checked />
+          Masquer les œuvres vendues
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Trier par</legend>
+        <select name="tri">
+          <option value="artiste">Artiste (A → Z)</option>
+          <option value="prix-croissant">Prix croissant</option>
+          <option value="prix-decroissant">Prix décroissant</option>
+        </select>
+      </fieldset>
+    </form>
+
+    <p class="compteur" id="compteur" aria-live="polite">
+      {oeuvres.length} œuvre{oeuvres.length > 1 ? "s" : ""}
+    </p>
+
+    <div class="grille" id="grille">
+      {oeuvres.map((o, i) => <CarteOeuvre oeuvre={o} prioritaire={i < 4} />)}
+    </div>
+
+    <p id="aucun-resultat" hidden style="color:var(--encre-douce)">
+      Aucune œuvre ne correspond à ces critères.
+      <button type="button" class="bouton bouton-clair" id="reinitialiser">
+        Réinitialiser les filtres
+      </button>
+    </p>
+  </div>
+</Base>
+
+<script>
+  const form = document.getElementById("filtres") as HTMLFormElement;
+  const grille = document.getElementById("grille") as HTMLElement;
+  const compteur = document.getElementById("compteur") as HTMLElement;
+  const vide = document.getElementById("aucun-resultat") as HTMLElement;
+  const raz = document.getElementById("reinitialiser") as HTMLButtonElement;
+  const cartes = Array.from(grille.querySelectorAll<HTMLElement>(".carte"));
+
+  /** Restaure l'état des filtres depuis l'URL, pour qu'un lien filtré soit partageable. */
+  function lireURL() {
+    const p = new URLSearchParams(location.search);
+
+    const artistes = p.getAll("artiste");
+    form.querySelectorAll<HTMLInputElement>('input[name="artiste"]').forEach((c) => {
+      c.checked = artistes.includes(c.value);
+    });
+
+    const prix = p.get("prix");
+    if (prix) (form.elements.namedItem("prix") as HTMLSelectElement).value = prix;
+
+    const tri = p.get("tri");
+    if (tri) (form.elements.namedItem("tri") as HTMLSelectElement).value = tri;
+
+    const vendues = form.elements.namedItem("masquer-vendues") as HTMLInputElement;
+    if (p.has("vendues")) vendues.checked = p.get("vendues") !== "1";
+  }
+
+  function ecrireURL(artistes: string[], prix: string, tri: string, masquer: boolean) {
+    const p = new URLSearchParams();
+    artistes.forEach((a) => p.append("artiste", a));
+    if (prix) p.set("prix", prix);
+    if (tri !== "artiste") p.set("tri", tri);
+    if (!masquer) p.set("vendues", "1");
+    const q = p.toString();
+    history.replaceState(null, "", q ? `?${q}` : location.pathname);
+  }
+
+  function appliquer() {
+    const artistes = Array.from(
+      form.querySelectorAll<HTMLInputElement>('input[name="artiste"]:checked'),
+    ).map((c) => c.value);
+    const prix = (form.elements.namedItem("prix") as HTMLSelectElement).value;
+    const tri = (form.elements.namedItem("tri") as HTMLSelectElement).value;
+    const masquer = (form.elements.namedItem("masquer-vendues") as HTMLInputElement).checked;
+
+    const [bas, haut] = prix ? prix.split("-") : ["", ""];
+    const min = bas === "" ? -Infinity : Number(bas);
+    const max = haut === "" || haut === undefined ? Infinity : Number(haut);
+
+    let visibles = 0;
+    for (const carte of cartes) {
+      const a = carte.dataset.artiste ?? "";
+      const brut = carte.dataset.prix ?? "";
+      const p = brut === "" ? null : Number(brut);
+      const statut = carte.dataset.statut ?? "disponible";
+
+      // Une œuvre sans prix reste visible tant qu'aucune tranche n'est demandée.
+      const okArtiste = artistes.length === 0 || artistes.includes(a);
+      const okPrix = !prix ? true : p !== null && p >= min && p <= max;
+      const okStatut = !masquer || statut !== "vendue";
+
+      const montrer = okArtiste && okPrix && okStatut;
+      carte.style.display = montrer ? "" : "none";
+      if (montrer) visibles++;
+    }
+
+    const ordonnees = [...cartes].sort((x, y) => {
+      const px = x.dataset.prix === "" ? Infinity : Number(x.dataset.prix);
+      const py = y.dataset.prix === "" ? Infinity : Number(y.dataset.prix);
+      if (tri === "prix-croissant") return px - py;
+      if (tri === "prix-decroissant") return py - px;
+      return (x.dataset.artiste ?? "").localeCompare(y.dataset.artiste ?? "", "fr");
+    });
+    ordonnees.forEach((c) => grille.appendChild(c));
+
+    compteur.textContent = `${visibles} œuvre${visibles > 1 ? "s" : ""}`;
+    vide.hidden = visibles > 0;
+    ecrireURL(artistes, prix, tri, masquer);
+  }
+
+  form.addEventListener("change", appliquer);
+  form.addEventListener("submit", (e) => e.preventDefault());
+  raz.addEventListener("click", () => {
+    form.reset();
+    (form.elements.namedItem("masquer-vendues") as HTMLInputElement).checked = true;
+    appliquer();
+  });
+
+  lireURL();
+  appliquer();
+</script>

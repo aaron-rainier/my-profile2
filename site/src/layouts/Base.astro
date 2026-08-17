@@ -1,0 +1,83 @@
+---
+import "../styles/global.css";
+import { SITE_NOM } from "../lib/oeuvres";
+
+interface Props {
+  titre: string;
+  description: string;
+  image?: string;
+  /** JSON-LD sérialisé, injecté tel quel dans le <head>. */
+  jsonLd?: string;
+}
+
+const { titre, description, image, jsonLd } = Astro.props;
+const url = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
+const imageAbsolue = image && Astro.site ? new URL(image, Astro.site).href : image;
+const chemin = Astro.url.pathname.replace(/\/$/, "") || "/";
+
+const liens = [
+  { href: "/catalogue", libelle: "Catalogue" },
+  { href: "/artistes", libelle: "Artistes" },
+  { href: "/a-propos", libelle: "La collection" },
+  { href: "/contact", libelle: "Contact" },
+];
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titre}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={url} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={titre} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    <meta property="og:locale" content="fr_FR" />
+    {imageAbsolue && <meta property="og:image" content={imageAbsolue} />}
+    <meta name="twitter:card" content={imageAbsolue ? "summary_large_image" : "summary"} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
+  </head>
+
+  <body>
+    <header class="site-entete">
+      <div class="enveloppe">
+        <a class="marque" href="/">{SITE_NOM}</a>
+        <nav class="site-nav" aria-label="Navigation principale">
+          {
+            liens.map((l) => (
+              <a href={l.href} aria-current={chemin === l.href ? "page" : undefined}>
+                {l.libelle}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-pied">
+      <div class="enveloppe">
+        <p>© {new Date().getFullYear()} — Collection privée, Paris</p>
+        <p>
+          <a href="/mentions-legales">Mentions légales</a>
+          <a href="/confidentialite">Confidentialité</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

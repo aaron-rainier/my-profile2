@@ -1,0 +1,447 @@
+:root {
+  --fond: #fafaf8;
+  --fond-carte: #ffffff;
+  --encre: #1a1a1a;
+  --encre-douce: #5a5a56;
+  --trait: #e3e2dd;
+  --accent: #2d3f52;
+  --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --large: 1180px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--encre);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  line-height: 1.15;
+  margin: 0 0 0.5em;
+  letter-spacing: 0.01em;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+}
+h2 {
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+}
+h3 {
+  font-size: 1.2rem;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.enveloppe {
+  max-width: var(--large);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.etroit {
+  max-width: 720px;
+}
+
+/* ---------- En-tête ---------- */
+.site-entete {
+  border-bottom: 1px solid var(--trait);
+  background: var(--fond);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.site-entete .enveloppe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-top: 1.1rem;
+  padding-bottom: 1.1rem;
+  flex-wrap: wrap;
+}
+
+.marque {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  color: var(--encre);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.site-nav {
+  display: flex;
+  gap: 1.6rem;
+  flex-wrap: wrap;
+}
+
+.site-nav a {
+  color: var(--encre-douce);
+  text-decoration: none;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+  color: var(--encre);
+}
+
+/* ---------- Sections ---------- */
+main {
+  padding: 3.5rem 0 5rem;
+}
+
+.section {
+  margin-bottom: 4.5rem;
+}
+
+.chapeau {
+  color: var(--encre-douce);
+  font-size: 1.05rem;
+  max-width: 62ch;
+}
+
+.surtitre {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  color: var(--encre-douce);
+  margin-bottom: 0.7rem;
+}
+
+/* ---------- Grille d'œuvres ---------- */
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 2.4rem 1.8rem;
+}
+
+.carte {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+.carte-visuel {
+  background: var(--fond-carte);
+  border: 1px solid var(--trait);
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.carte-visuel img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.4s ease;
+}
+
+.carte:hover .carte-visuel img {
+  transform: scale(1.03);
+}
+
+.sans-photo {
+  color: #b6b5ae;
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 1rem;
+  font-family: var(--sans);
+  word-break: break-all;
+}
+
+.carte-artiste {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  margin-top: 0.85rem;
+}
+
+.carte-titre {
+  color: var(--encre-douce);
+  font-size: 0.92rem;
+  font-style: italic;
+}
+
+.carte-prix {
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+}
+
+.pastille {
+  display: inline-block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--trait);
+  color: var(--encre-douce);
+  background: var(--fond-carte);
+}
+
+.pastille-vendue {
+  border-color: #c9b8b8;
+  color: #8a5a5a;
+}
+
+/* ---------- Filtres ---------- */
+.filtres {
+  border: 1px solid var(--trait);
+  background: var(--fond-carte);
+  padding: 1.4rem 1.5rem;
+  margin-bottom: 2.5rem;
+  display: grid;
+  gap: 1.3rem;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  align-items: start;
+}
+
+.filtres fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.filtres legend {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--encre-douce);
+  margin-bottom: 0.6rem;
+  padding: 0;
+}
+
+.filtres label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.92rem;
+  margin-bottom: 0.3rem;
+  cursor: pointer;
+}
+
+.filtres select {
+  width: 100%;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid var(--trait);
+  background: var(--fond);
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: inherit;
+}
+
+.compteur {
+  font-size: 0.88rem;
+  color: var(--encre-douce);
+  margin-bottom: 1.5rem;
+}
+
+/* ---------- Fiche œuvre ---------- */
+.fiche {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 3.5rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .fiche {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.fiche-visuel {
+  background: var(--fond-carte);
+  border: 1px solid var(--trait);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.fiche-visuel img {
+  max-height: 72vh;
+  object-fit: contain;
+}
+
+.vignettes {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.vignettes button {
+  border: 1px solid var(--trait);
+  background: var(--fond-carte);
+  padding: 0.35rem;
+  width: 76px;
+  height: 76px;
+  cursor: pointer;
+}
+
+.vignettes button[aria-pressed="true"] {
+  border-color: var(--accent);
+}
+
+.vignettes img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.caracteristiques {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.93rem;
+}
+
+.caracteristiques th,
+.caracteristiques td {
+  text-align: left;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--trait);
+  vertical-align: top;
+}
+
+.caracteristiques th {
+  font-weight: 500;
+  color: var(--encre-douce);
+  width: 42%;
+  font-size: 0.85rem;
+}
+
+.prix-fort {
+  font-family: var(--serif);
+  font-size: 2.1rem;
+  margin: 1.2rem 0 0.4rem;
+}
+
+.bouton {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  padding: 0.85rem 1.9rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.bouton:hover {
+  background: #1f2d3c;
+}
+
+.bouton-clair {
+  background: transparent;
+  color: var(--accent);
+}
+
+.bouton-clair:hover {
+  background: #eef1f4;
+}
+
+.bandeau-vendue {
+  background: #f3ecec;
+  border: 1px solid #dfcccc;
+  color: #7d4b4b;
+  padding: 0.9rem 1.1rem;
+  margin: 1.2rem 0;
+  font-size: 0.93rem;
+}
+
+/* ---------- Formulaire ---------- */
+.champ {
+  margin-bottom: 1.2rem;
+}
+
+.champ label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--encre-douce);
+  margin-bottom: 0.35rem;
+}
+
+.champ input,
+.champ textarea {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--trait);
+  background: var(--fond-carte);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: inherit;
+}
+
+.champ textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+/* ---------- Pied ---------- */
+.site-pied {
+  border-top: 1px solid var(--trait);
+  padding: 2.5rem 0;
+  font-size: 0.87rem;
+  color: var(--encre-douce);
+}
+
+.site-pied .enveloppe {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.site-pied a {
+  color: var(--encre-douce);
+  margin-right: 1.2rem;
+}
+
+.visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

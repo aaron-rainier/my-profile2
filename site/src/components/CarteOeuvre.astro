@@ -1,0 +1,52 @@
+---
+import type { Oeuvre } from "../lib/oeuvres";
+
+interface Props {
+  oeuvre: Oeuvre;
+  /** Les images au-dessus de la ligne de flottaison ne doivent pas être différées. */
+  prioritaire?: boolean;
+}
+
+const { oeuvre, prioritaire = false } = Astro.props;
+const alt = `${oeuvre.artiste} — ${oeuvre.titreAffiche} — lithographie originale signée`;
+---
+
+<a
+  class="carte"
+  href={`/oeuvre/${oeuvre.id}`}
+  data-artiste={oeuvre.artisteSlug}
+  data-prix={oeuvre.prix ?? ""}
+  data-statut={oeuvre.statut}
+>
+  <div class="carte-visuel">
+    {
+      oeuvre.images.length > 0 ? (
+        <img
+          src={oeuvre.images[0]}
+          alt={alt}
+          loading={prioritaire ? "eager" : "lazy"}
+          decoding="async"
+        />
+      ) : (
+        <span class="sans-photo">
+          Photo à déposer&nbsp;:<br />
+          public/oeuvres/{oeuvre.id}-1.jpg
+        </span>
+      )
+    }
+  </div>
+
+  <span class="carte-artiste">{oeuvre.artiste}</span>
+  <span class="carte-titre">{oeuvre.titreAffiche}</span>
+  <span class="carte-prix">
+    {
+      oeuvre.statut === "vendue" ? (
+        <span class="pastille pastille-vendue">Vendue</span>
+      ) : oeuvre.statut === "reservee" ? (
+        <span class="pastille">Réservée</span>
+      ) : (
+        oeuvre.prixTexte
+      )
+    }
+  </span>
+</a>

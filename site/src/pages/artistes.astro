@@ -1,0 +1,40 @@
+---
+import Base from "../layouts/Base.astro";
+import { tousLesArtistes } from "../lib/oeuvres";
+
+const artistes = tousLesArtistes();
+---
+
+<Base
+  titre="Les artistes de la collection — lithographies originales"
+  description={`Les artistes représentés dans la collection : ${artistes.map((a) => a.nom).join(", ")}.`}
+>
+  <div class="enveloppe">
+    <p class="surtitre">Artistes</p>
+    <h1>Les artistes de la collection</h1>
+
+    <div class="grille" style="margin-top:2.5rem">
+      {
+        artistes.map((a) => {
+          const couverture = a.oeuvres.find((o) => o.images.length > 0)?.images[0];
+          return (
+            <a class="carte" href={`/artiste/${a.slug}`}>
+              <div class="carte-visuel">
+                {couverture ? (
+                  <img src={couverture} alt={`Lithographie de ${a.nom}`} loading="lazy" />
+                ) : (
+                  <span class="sans-photo">{a.nom}</span>
+                )}
+              </div>
+              <span class="carte-artiste">{a.nom}</span>
+              <span class="carte-titre">
+                {a.disponibles} œuvre{a.disponibles > 1 ? "s" : ""} disponible
+                {a.disponibles > 1 ? "s" : ""}
+              </span>
+            </a>
+          );
+        })
+      }
+    </div>
+  </div>
+</Base>

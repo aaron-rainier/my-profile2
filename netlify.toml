@@ -1,0 +1,10 @@
+# Publication du site de la collection de lithographies.
+# Le dossier `site/` est construit par Astro ; la racine du dépôt (la page de
+# profil personnelle) n'est pas touchée.
+[build]
+  base = "site"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"

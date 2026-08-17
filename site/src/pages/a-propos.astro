@@ -1,0 +1,75 @@
+---
+import Base from "../layouts/Base.astro";
+import { toutesLesOeuvres, tousLesArtistes } from "../lib/oeuvres";
+
+const total = toutesLesOeuvres().length;
+const artistes = tousLesArtistes();
+---
+
+<Base
+  titre="La collection — origine, conservation et authenticité"
+  description="Une collection privée de lithographies originales constituée auprès d'éditeurs d'art français entre 1970 et 1990. Signées, numérotées, conservées à plat, certificats d'authenticité fournis."
+>
+  <div class="enveloppe etroit">
+    <p class="surtitre">La collection</p>
+    <h1>Une collection constituée sur vingt ans</h1>
+
+    <h2>Origine</h2>
+    <p>
+      Les œuvres présentées ici ont été acquises auprès d'éditeurs d'art français entre les années
+      1970 et 1990, à l'époque où ces maisons publiaient les grands noms de la figuration et de
+      l'École de Paris en éditions limitées. Chaque pièce a été achetée neuve, directement en
+      édition, et conservée depuis.
+    </p>
+
+    <h2>Ce que vous achetez</h2>
+    <p>
+      Une <strong>estampe originale</strong>, et non une reproduction. La distinction est simple :
+      une reproduction photographique d'un tableau est imprimée en série sans intervention de
+      l'artiste. Une estampe originale est tirée en édition limitée, chaque épreuve est
+      <strong>signée à la main au crayon</strong> par l'artiste et porte son
+      <strong>numéro dans le tirage</strong>, inscrit lui aussi au crayon.
+    </p>
+    <p>
+      Le <strong>certificat d'authenticité d'origine</strong>, délivré par l'éditeur, accompagne
+      chaque œuvre.
+    </p>
+
+    <h2>État de conservation</h2>
+    <p>
+      L'ensemble est resté en feuilles, à plat, dans ses cartons d'origine, à l'abri de la lumière
+      et de l'humidité. Les marges sont pleines et n'ont jamais été massicotées. Aucune feuille n'a
+      été montée sous verre ni encadrée — donc ni trace de passe-partout, ni insolation, ni
+      rousseurs de contact. L'état est celui du jour du tirage.
+    </p>
+
+    <h2>Format</h2>
+    <p>
+      La majorité des feuilles mesurent 56 × 76 cm, format d'édition courant chez ces éditeurs. Les
+      dimensions exactes sont précisées sur chaque fiche.
+    </p>
+
+    <h2>Remise et expédition</h2>
+    <p>
+      <strong>Remise en main propre à Paris</strong> : c'est la solution que je privilégie. Vous
+      voyez l'œuvre avant de l'emporter, sans frais ni risque de transport.
+    </p>
+    <p>
+      <strong>Expédition</strong> : en tube rigide de fort diamètre, l'œuvre enroulée dans du
+      papier neutre, envoi suivi et assuré à hauteur du prix de vente. Les frais dépendent de la
+      destination et sont indiqués avant tout engagement.
+    </p>
+
+    <h2>La collection en chiffres</h2>
+    <ul>
+      <li>{total} œuvre{total > 1 ? "s" : ""} référencée{total > 1 ? "s" : ""} sur ce site</li>
+      <li>{artistes.length} artiste{artistes.length > 1 ? "s" : ""}</li>
+      <li>100 % signées au crayon et numérotées</li>
+      <li>100 % avec certificat d'authenticité</li>
+    </ul>
+
+    <p style="margin-top:2.5rem">
+      <a class="bouton" href="/catalogue">Voir le catalogue</a>
+    </p>
+  </div>
+</Base>

@@ -1,0 +1,105 @@
+---
+import Base from "../layouts/Base.astro";
+
+// Remplace cette adresse par la tienne : c'est la seule ligne à changer pour
+// que le formulaire fonctionne.
+const EMAIL = "adresse@a-completer.fr";
+---
+
+<Base
+  titre="Contact — demander une œuvre de la collection"
+  description="Formulaire de contact pour toute demande sur une lithographie de la collection. Remise en main propre à Paris ou expédition en tube rigide assuré."
+>
+  <div class="enveloppe etroit">
+    <p class="surtitre">Contact</p>
+    <h1>Une question, une œuvre&nbsp;?</h1>
+    <p class="chapeau">
+      Écrivez-moi pour toute demande : disponibilité, photos supplémentaires, précisions sur un
+      tirage, frais d'expédition, ou pour convenir d'un rendez-vous à Paris.
+    </p>
+
+    <form id="formulaire" style="margin-top:2.5rem">
+      <div class="champ">
+        <label for="nom">Votre nom</label>
+        <input type="text" id="nom" name="nom" required autocomplete="name" />
+      </div>
+
+      <div class="champ">
+        <label for="email">Votre email</label>
+        <input type="email" id="email" name="email" required autocomplete="email" />
+      </div>
+
+      <div class="champ">
+        <label for="telephone">Votre téléphone (facultatif)</label>
+        <input type="tel" id="telephone" name="telephone" autocomplete="tel" />
+      </div>
+
+      <div class="champ">
+        <label for="oeuvre">Œuvre concernée</label>
+        <input type="text" id="oeuvre" name="oeuvre" placeholder="Référence ou nom de l'artiste" />
+      </div>
+
+      <div class="champ">
+        <label for="message">Votre message</label>
+        <textarea id="message" name="message" required></textarea>
+      </div>
+
+      <button type="submit" class="bouton">Envoyer</button>
+      <p id="repli" hidden style="color:var(--encre-douce);font-size:0.9rem;margin-top:1rem">
+        Votre logiciel de messagerie devrait s'ouvrir avec le message pré-rempli. S'il ne le fait
+        pas, écrivez directement à <a href={`mailto:${EMAIL}`}>{EMAIL}</a>.
+      </p>
+    </form>
+
+    <section style="margin-top:3.5rem">
+      <h2>Modalités</h2>
+      <p>
+        <strong>Remise en main propre à Paris</strong> — sans frais, sur rendez-vous. Vous voyez
+        l'œuvre avant de l'emporter.
+      </p>
+      <p>
+        <strong>Expédition</strong> — tube rigide de fort diamètre, papier neutre, envoi suivi et
+        assuré. Les frais sont annoncés avant tout engagement.
+      </p>
+      <p>
+        <strong>Paiement</strong> — virement bancaire ou espèces lors d'une remise en main propre.
+      </p>
+    </section>
+  </div>
+</Base>
+
+<script define:vars={{ EMAIL }}>
+  const form = document.getElementById("formulaire");
+  const repli = document.getElementById("repli");
+
+  // Pré-remplit le champ « œuvre » quand on arrive depuis une fiche.
+  const depuisFiche = new URLSearchParams(location.search).get("oeuvre");
+  if (depuisFiche) {
+    const champ = document.getElementById("oeuvre");
+    if (champ) champ.value = depuisFiche;
+  }
+
+  // Sans service d'envoi configuré, on bascule proprement sur le client mail
+  // du visiteur plutôt que d'afficher un formulaire qui ne fait rien.
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const d = new FormData(form);
+    const sujet = d.get("oeuvre")
+      ? `Demande — ${d.get("oeuvre")}`
+      : "Demande — collection de lithographies";
+    const corps = [
+      `Nom : ${d.get("nom")}`,
+      `Email : ${d.get("email")}`,
+      d.get("telephone") ? `Téléphone : ${d.get("telephone")}` : "",
+      d.get("oeuvre") ? `Œuvre : ${d.get("oeuvre")}` : "",
+      "",
+      d.get("message"),
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    window.location.href =
+      `mailto:${EMAIL}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
+    if (repli) repli.hidden = false;
+  });
+</script>

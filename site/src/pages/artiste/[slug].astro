@@ -1,0 +1,70 @@
+---
+import Base from "../../layouts/Base.astro";
+import CarteOeuvre from "../../components/CarteOeuvre.astro";
+import { tousLesArtistes } from "../../lib/oeuvres";
+
+export function getStaticPaths() {
+  return tousLesArtistes().map((artiste) => ({
+    params: { slug: artiste.slug },
+    props: { artiste },
+  }));
+}
+
+const { artiste } = Astro.props;
+const disponibles = artiste.oeuvres.filter((o) => o.statut !== "vendue");
+const vendues = artiste.oeuvres.filter((o) => o.statut === "vendue");
+const couverture = artiste.oeuvres.find((o) => o.images.length > 0)?.images[0];
+---
+
+<Base
+  titre={`${artiste.nom} — lithographies originales signées et numérotées`}
+  description={`${artiste.oeuvres.length} lithographie(s) originale(s) de ${artiste.nom}, signées au crayon et numérotées, en feuilles, état neuf, certificat d'authenticité fourni.`}
+  image={couverture}
+>
+  <div class="enveloppe">
+    <p class="surtitre">
+      <a href="/artistes" style="color:inherit">Artistes</a>
+    </p>
+    <h1>{artiste.nom}</h1>
+
+    <div class="etroit">
+      <p class="chapeau">
+        <!--
+          À COMPLÉTER PAR LE PROPRIÉTAIRE DU SITE.
+          Ce texte est volontairement laissé vide : aucune donnée biographique n'a été
+          générée automatiquement, afin qu'aucune date ni aucun fait inexact ne soit
+          publié au sujet d'un artiste réel.
+        -->
+        [À COMPLÉTER : quelques lignes de présentation de {artiste.nom}. Ce paragraphe se
+        modifie dans le fichier src/pages/artiste/[slug].astro.]
+      </p>
+    </div>
+
+    <section class="section" style="margin-top:3rem">
+      <h2>
+        {disponibles.length} œuvre{disponibles.length > 1 ? "s" : ""} disponible{
+          disponibles.length > 1 ? "s" : ""
+        }
+      </h2>
+      <div class="grille">
+        {disponibles.map((o, i) => <CarteOeuvre oeuvre={o} prioritaire={i < 4} />)}
+      </div>
+    </section>
+
+    {
+      vendues.length > 0 && (
+        <section class="section">
+          <h2>Œuvres vendues</h2>
+          <p class="chapeau" style="margin-bottom:1.5rem">
+            Conservées ici à titre de référence.
+          </p>
+          <div class="grille">
+            {vendues.map((o) => (
+              <CarteOeuvre oeuvre={o} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </div>
+</Base>
